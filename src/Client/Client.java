@@ -96,104 +96,105 @@ public class Client extends javax.swing.JFrame {
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         // TODO add your handling code here:
-        
-        if(fileName.equals("")){
-            fc = new FileDialog(this, "Choose a file", FileDialog.LOAD);
-            fc.setDirectory("C:\\");
-            fc.setVisible(true);
-            fileName = fc.getFile();
-            clientText.setText(clientText.getText()+fileName+"\n");
-            connectButton.setText("Copy");
+        if(connectButton.getText().equals("Exit")){
+            setVisible(false); //you can't see me!
+            dispose(); //Destroy the JFrame object
         }
-        else{
-            
-            clientThread = new Thread(){
-
-                public void run(){
-                   PrintWriter out = null;
-                   BufferedReader in = null;
-                   int filesize = 4346250; //filesize temporary hardcoded 
-                   int bytesRead;
-                   int current = 0;
-
-                    try {
-                        socket = new Socket("127.0.0.1", 55555);   //establish the socket connection between the client and the server
-                        clientText.setText("Connection has been created.");
-                       
-                        out = new PrintWriter(socket.getOutputStream(), true);
-                        out.println("<dist>"+fileName);
-                        //out.close();
-                        
-                        byte [] mybytearray = new byte [filesize];
-                        InputStream is = socket.getInputStream();
-
-                        FileOutputStream fos = new FileOutputStream ("copy_"+fileName);
-
-                        BufferedOutputStream bos = new BufferedOutputStream(fos);
-
-                        bytesRead = is.read(mybytearray, 0, mybytearray.length/2);
-                        current = bytesRead;
-
-                        //clientText.setText(clientText.getText()+"\nCurrent bytesRead is - "+current);
-                        do{
-                          clientText.setText(clientText.getText()+"\nbytesRead - "+bytesRead+" Current is "+current);
-                          bytesRead =  is.read(mybytearray, current, (mybytearray.length/2-current)); 
-                          if (bytesRead >=0) current +=bytesRead;
-                        }while (bytesRead > 0);
-                        System.out.println("Middle!!!");
-                        /*
-                        in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-
-                        String msg;
-                        while ((msg = in.readLine()) != null){
-                            if(msg.contains("<System>:<middle>")){
-                                System.out.println(msg);
-                               out = new PrintWriter(socket.getOutputStream(), true);
-                               out.println("<System>:<middle>");
-
-                                bytesRead = is.read(mybytearray, mybytearray.length/2, mybytearray.length);
-                                current = bytesRead;
-
-                                //clientText.setText(clientText.getText()+"\nCurrent bytesRead is - "+current);
-                                do{
-                                  clientText.setText(clientText.getText()+"\nbytesRead - "+bytesRead+" Current is "+current);
-                                  bytesRead =  is.read(mybytearray, current, (mybytearray.length-current)); 
-                                  if (bytesRead >=0) current +=bytesRead;
-                                }while (bytesRead > 0);
-                                    }
-                         }
-                       */
-                        bos.write(mybytearray, 0, current);
-                       // bos.close();
-                        JFrame frame = new JFrame("JOptionPane showMessageDialog example");
-                        int n = -1;
-                        n = JOptionPane.showConfirmDialog(frame,
-                        "Would you like to continue?",
-                        "Question",
-                        JOptionPane.DEFAULT_OPTION);
-                        System.out.println(n);
-                        clientText.setText(clientText.getText()+"\nMiddle!!!!!");
-                        while(n!=0){}
-                        int next = current;
-                        bytesRead = is.read(mybytearray, 0, mybytearray.length);
-                        current = bytesRead;
-                        do{
-                          clientText.setText(clientText.getText()+"\nbytesRead - "+bytesRead+" Current is "+current);
-                          bytesRead =  is.read(mybytearray, current, (mybytearray.length-current)); 
-                          if (bytesRead >=0) current +=bytesRead;
-                        }while (bytesRead > 0);
-                        bos.write(mybytearray, 0, current);
-                        bos.close();
-                        bos.flush();
-                        //socket.close();
-
-                 } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        else {
+            if(fileName.equals("")){
+                fc = new FileDialog(this, "Choose a file", FileDialog.LOAD);
+                fc.setDirectory("C:\\");
+                fc.setVisible(true);
+                fileName = fc.getFile();
+                clientText.setText(clientText.getText()+fileName+"\n");
+                connectButton.setText("Copy");
             }
+            else{
 
+                clientThread = new Thread(){
+
+                    public void run(){
+                       PrintWriter out = null;
+                       BufferedReader in = null;
+                       int filesize = 4346250; //filesize temporary hardcoded 
+                       int bytesRead;
+                       int current = 0;
+
+                        try {
+                            socket = new Socket("127.0.0.1", 55555);   //establish the socket connection between the client and the server
+                            clientText.setText("Connection has been created.\n");
+
+                            out = new PrintWriter(socket.getOutputStream(), true);
+                            out.println("<dist>"+fileName);
+                            //out.close();
+
+                            byte [] mybytearray = new byte [filesize];
+                            InputStream is = socket.getInputStream();
+
+                            FileOutputStream fos = new FileOutputStream ("copy_"+fileName);
+
+                            BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+                            bytesRead = is.read(mybytearray, 0, mybytearray.length/2);
+                            current = bytesRead;
+
+                            //clientText.setText(clientText.getText()+"\nCurrent bytesRead is - "+current);
+                            do{
+                           //   clientText.setText(clientText.getText()+"\nbytesRead - "+bytesRead+" Current is "+current);
+                              bytesRead =  is.read(mybytearray, current, (mybytearray.length/2-current)); 
+                              if (bytesRead >=0) current +=bytesRead;
+                            }while (bytesRead > 0);
+
+                            System.out.println("Middle!!!");
+
+                            //Continue window
+                            bos.write(mybytearray, 0, current);
+                            JFrame frame = new JFrame("JOptionPane showMessageDialog example");
+                            int n = -1;
+                            n = JOptionPane.showConfirmDialog(frame,
+                            "50 % has been copied.\nWould you like to continue?",
+                            "Question",
+                            JOptionPane.DEFAULT_OPTION);
+                            //System.out.println(n);
+                            //clientText.setText(clientText.getText()+"\nMiddle!!!!!");
+
+                            while(n!=0){}
+                            int next = current;
+                            bytesRead = is.read(mybytearray, 0, mybytearray.length);
+                            current = bytesRead;
+                            do{
+                             // clientText.setText(clientText.getText()+"\nbytesRead - "+bytesRead+" Current is "+current);
+                              bytesRead =  is.read(mybytearray, current, (mybytearray.length-current)); 
+                              if (bytesRead >=0) current +=bytesRead;
+                            }while (bytesRead > 0);
+                            bos.write(mybytearray, 0, current);
+                            bos.close();
+                            bos.flush();
+                            //socket.close();
+                            clientText.setText(clientText.getText()+"File was copied.\nThe last byte was "+current+"\n");
+
+                            //Wating for disconnect command
+                            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            String msg;
+                            while ((msg = in.readLine()) != null){
+                                if(msg.contains("DisconnectAll")){
+                                    socket.close();
+                                    clientText.setText(clientText.getText()+"Server has been disconnect.\n");
+                                    break;
+                                }
+
+                            }
+
+                     } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            };
-            clientThread.start();
+
+                    }
+                };
+                connectButton.setText("Exit");
+                clientThread.start();
+                // connectButton.setText("Exit");
+            }
         }
     }//GEN-LAST:event_connectButtonActionPerformed
 

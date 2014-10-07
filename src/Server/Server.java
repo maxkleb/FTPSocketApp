@@ -7,6 +7,7 @@
 package Server;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,11 +22,12 @@ import java.util.logging.Logger;
 public class Server extends javax.swing.JFrame {
     
     private int port = 55555;
-    private ServerSocket server;
-    private Socket client;
-    private Thread serverThread,clientThread;
+    private ServerSocket server = null;
+    private Socket client[] = new Socket[2];
+    private Thread clientThread[] = new Thread[2],serverThread;
     private ArrayList<String> names = new ArrayList<String>();
     private int count = 0;
+    private boolean isRun = false;
     
     /**
      * Creates new form Server
@@ -50,7 +52,7 @@ public class Server extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        startButton.setText("Start ");
+        startButton.setText("Start");
         startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startButtonActionPerformed(evt);
@@ -96,39 +98,68 @@ public class Server extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         // TODO add your handling code here:
-        serverThread = new Thread(){
-        public void run(){
-            serverText.setText("---------------------------------WELCOME------------------------------------");
+        if(startButton.getText().equals("Start")){
+            isRun = true;
+            
+            serverThread = new Thread(){
+            public void run(){
+                serverText.setText("---------------------------------WELCOME------------------------------------");
+                try {
+                    server = new ServerSocket(port);
+                } catch (IOException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                serverText.setText(serverText.getText()+"\nConnection to " +port+" port!\n" );
+                  while(isRun){
+
+                         try{
+
+                             while(count<2){
+                                client[count] = server.accept();
+                                clientThread[count] = new ClientListener(client[count]);
+                                clientThread[count].start();
+                                
+                                serverText.setText(serverText.getText()+"\nSocket has been opened.\nCounter is: "+count+" now.");
+                                InetAddress addr = client[count].getInetAddress();
+                                serverText.setText(serverText.getText()+"\nConnection to " +addr.getHostAddress()+"\n");
+                                if(!isRun) break;
+                                count++;
+                             }
+                        } catch (IOException ex) {
+                            serverText.setText(serverText.getText()+"\nServer was stoped!\n" );
+                        }
+
+                     }
+            }     
+
+
+            };
+            serverThread.start();
+            startButton.setText("Stop");
+
+        }
+        else
+        {
+           PrintWriter out;
+           names.clear();
+           isRun = false;
+           
             try {
-                server = new ServerSocket(port);
+                for(int i=0;i<count;i++){
+                    if(clientThread[i].isAlive()) 
+                         System.out.println("Client thread "+i+"is alive!\n");
+                  //  out = new PrintWriter(client[i].getOutputStream(), true);
+                   // out.println("<System>:<DisconnectAll>");
+                   // client[i].close();
+                     System.out.println("Client socket "+i+" closed!\n"); 
+                }
+                server.close();
+                count = 0;
             } catch (IOException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+              System.out.println("Cannot close the connection!!!");
             }
-            serverText.setText(serverText.getText()+"\nConnection to " +port+" port!\n" );
-              while(true){
-                     
-                     try{
-                          
-                         while(count<2){
-                            client = server.accept();
-                            clientThread = new ClientListener(client);
-                            clientThread.start();
-                            count++;
-                            serverText.setText(serverText.getText()+"\nSocket has been opened.\nCounter is: "+count+" now.");
-                            InetAddress addr = client.getInetAddress();
-                            serverText.setText(serverText.getText()+"\nConnection to " +addr.getHostAddress()+"\n");
-                 
-                         }
-                    } catch (IOException ex) {
-                        serverText.setText(serverText.getText()+"\nServer was stoped!\n" );
-                    }
-                    
-                 }
-        }     
-                
-                
-        };
-        serverThread.start();
+            startButton.setText("Start");
+        }
     }//GEN-LAST:event_startButtonActionPerformed
 
     /**

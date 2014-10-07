@@ -38,7 +38,7 @@ class ClientListener extends Thread {
             in = new BufferedReader(new InputStreamReader(cl.getInputStream()));
             String msg,fileName = "";
             while ((msg = in.readLine()) != null){
-                 
+                    
                  if(msg.contains("<dist>")){
                    fileName = msg.substring(6);
                    System.out.println(fileName);
@@ -59,28 +59,9 @@ class ClientListener extends Thread {
             System.out.println("Sending file");
 
             os.write(mybytearray, 0, mybytearray.length);
-            /*
-            out = new PrintWriter(cl.getOutputStream(), true);
-            out.println("<System>:<middle>");
-            in = new BufferedReader(new InputStreamReader(cl.getInputStream())); 
-                    String msg;
-                 
-                     while ((msg = in.readLine()) != null){
-                         System.out.println(msg);
-                     if(msg.contains("<System>:<Continue>")){
-                         bis.read(mybytearray, mybytearray.length/2, mybytearray.length);
-                         os.write(mybytearray, mybytearray.length/2, mybytearray.length);}
-                     else{
-                         cl.close();
-                         break;
-                     
-                     }
-                     }
-            */
             os.flush();
             cl.close();
-                 //}
-                     
+              
              
               } catch (IOException ex) {
             Logger.getLogger(ClientListener.class.getName()).log(Level.SEVERE, null, ex);
